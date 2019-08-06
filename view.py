@@ -67,7 +67,7 @@ class view(object):
         self.enable_claasify()
         with open(self.path_to_directory + '\Structure.txt', "r") as f:
             test = pd.read_csv(self.path_to_directory+"\\train.csv")
-            self.model.create_classifier(f.readlines(),test)
+            self.model.create_classifier(f.readlines(),test,self.entered_number)
 
     def clik_on_classify(self):
         pass

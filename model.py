@@ -11,9 +11,9 @@ class model:
 
         pass
 
-    def create_classifier(self, keys, train):
+    def create_classifier(self, keys, train,bin_num):
         features = self.extract_features(keys)
-        self.navie_classifier = classifier(features, train)
+        self.navie_classifier = classifier(features, train,bin_num)
         pass
 
     def extract_features(self, keys):
