@@ -7,7 +7,7 @@ class classifier:
         self.bin_num = bin_number
         self.keys = keys
         self.train_data =train_data
-        self.numeric_attr=[]
+        self.numeric_attr={}
         self.bin_data={}
         self.train_data = self.pre_process(train_data)
         self.class_option = self.extract_class()
@@ -21,12 +21,21 @@ class classifier:
             if self.keys[key] == "class":
                 continue
             if self.keys[key] == "NUMERIC":
-                self.numeric_attr.append(key)
+                self.numeric_attr[key] = 0
                 train_data[key].fillna(train_data[key].mean(), inplace=True)
                 self.binning(key)
             else:
                 train_data[key].fillna(train_data[key].mode()[0], inplace=True)
         return train_data
+
+    def pre_procces_test_file(self,test_file):
+        for key in self.keys:
+            if key in self.numeric_attr:
+                test_file[key].fillna(test_file[key].mean(), inplace=True)
+            else:
+                test_file[key].fillna(test_file[key].mode()[0], inplace=True)
+        return test_file
+
 
 
     def extract_class(self):
@@ -63,7 +72,11 @@ class classifier:
         bin_width = (max-min)/self.bin_num
         for i in range(1,self.bin_num+1):
             if min+(i-1)*bin_width <= value < min+i*bin_width:
-                return i-1
+                return str(i-1)
+        if value < min:
+            return '0'
+        if value > max:
+            return str(self.bin_num-1)
 
     def calc_cond_prob(self):
         for key in self.keys:
@@ -89,11 +102,14 @@ class classifier:
         for clss in self.class_option:
             acc[clss]=1.0
             for key in self.keys:
+                if key == "class":
+                    continue
                 value = row[key]
                 if key in self.numeric_attr:
-                    value = self.get_bin_num(row[key])
-                prob = self.m_esitmate[key+'='+value+"|"+clss]
+                    value = self.get_bin_num(key,row[key])
+                cond_prob_in_str = key+'='+value+"|"+clss
+                prob = self.m_esitmate[cond_prob_in_str]
                 acc[clss] = acc[clss] * prob
             acc[clss] = self.class_prob[clss]*acc[clss]
-
-        pass
+        acc= sorted(acc.items(), key=lambda (k, v): v,reverse=True)
+        return acc[0][0]
