@@ -101,6 +101,7 @@ class view(object):
                 self.model.create_classifier(file_content, train, self.entered_number)
             else:
                 messagebox.showerror("Naive Bayes Classifier", "the file Structure.txt has no data!")
+                return
 
             messagebox.showinfo("Naive Bayes Classifier", "Building classifier using train-set is done!")
 
