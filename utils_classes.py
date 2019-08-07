@@ -1,8 +1,14 @@
 import pandas as pd
 import numpy as np
 
-
+"""
+This class represent a classifier.
+A classifiers allow to make predictions to new incoming data based on the train set. 
+"""
 class classifier:
+    """
+    Ctor-  Defines the class members
+    """
     def __init__(self,keys,train_data,bin_number):
         self.bin_num = bin_number
         self.keys = keys
@@ -17,6 +23,12 @@ class classifier:
 
 
     def pre_process(self, train_data):
+        """
+        This method responsible for data cleaning:
+        Fill the missinig values where is needed and performs bining partition for NUMERIC features.
+        :param train_data:
+        :return:
+        """
         for key in self.keys:
             if self.keys[key] == "class":
                 continue
@@ -44,6 +56,10 @@ class classifier:
         return clss
 
     def calc_class_prob(self):
+        """
+        Calculates the probability for each of the target class values
+        :return:
+        """
         prob = {}
         total_row_number =self.train_data.shape[0]
         for clss in self.class_option:
@@ -53,6 +69,12 @@ class classifier:
 
 
     def binning(self, key):
+        """
+        This method responsible to divide the given numeric feature to bins.
+        The partition method is "Equal Width Partitioning"
+        :param key: Given column to divide
+        :return: Set the new values in the given column - each value according its bin which it belongs to.
+        """
         min = self.train_data[key].min()
         max = self.train_data[key].max()+1
         self.bin_data[key]={'max':max,'min':min}
@@ -79,6 +101,10 @@ class classifier:
             return str(self.bin_num-1)
 
     def calc_cond_prob(self):
+        """
+        Calculates the conditional probability for each column
+        :return:
+        """
         for key in self.keys:
             if key == "class":
                 continue
@@ -89,6 +115,10 @@ class classifier:
                     self.m_esitmate[str(key)+'='+str(attr_val)+'|'+str(classify)]= self.conditinal(key,attr_val,classify)
 
     def conditinal(self, key, attr_val, classify):
+        """
+        Helper function for calculating m-estimator formula
+        :return:
+        """
         # a = self.train_data[self.train_data[key] == attr_val & self.train_data["Class"] == classify].shape[0]
         filter_by_class = self.train_data[self.train_data["class"] == classify ]
         filter_by_classify_and_attrVal = filter_by_class[filter_by_class[key] == attr_val]
@@ -98,6 +128,13 @@ class classifier:
         return cond_prob
 
     def predict(self,row):
+        """
+        Predicts the value for the given row.
+        The prediction is based on m-estimator
+
+        :param row:
+        :return:
+        """
         acc = {}
         for clss in self.class_option:
             acc[clss]=1.0

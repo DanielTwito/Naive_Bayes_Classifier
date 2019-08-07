@@ -4,6 +4,11 @@ from tkinter import messagebox
 import pandas as pd
 from model import model
 import os
+
+"""
+This class responsible for the GUI.
+Including all the objects on the screen and their event handlers.
+"""
 class view(object):
 
     def __init__(self, master, model):
@@ -35,6 +40,11 @@ class view(object):
         self.b_classify.config(state=DISABLED)
 
     def validate(self, new_text):
+        """
+        Validates that the user inserted number of bins.
+        :param new_text:
+        :return:
+        """
         ans = False
         if not new_text:  # the field is being cleared
             self.entered_number = 0
@@ -54,6 +64,11 @@ class view(object):
 
 
     def clik_on_browse_directory(self):
+        """
+        Handler for browse button.
+        Extracts the given directory path.
+        :return:
+        """
         try:
             self.path_to_directory = filedialog.askdirectory()
             self.directory_path.delete('1.0', END)
@@ -64,18 +79,43 @@ class view(object):
 
 
     def clik_on_build(self):
+        """
+        Handler for build button.
+        If all the requiered parameters were inserted well, the function will define a classifier and build a model.
+        :return:
+        """
         self.enable_claasify()
         missing = self.model.validate_files(os.listdir(self.path_to_directory))
-        if len(missing) > 0 :
-            messagebox.showerror("Naive Bayes Classifier","you must have this files "+ str(missing))
-            return
+        if len(missing) > 0:
+             messagebox.showerror("Naive Bayes Classifier", "you must have this files " + str(missing))
+             return
         with open(self.path_to_directory + '\Structure.txt', "r") as f:
-            test = pd.read_csv(self.path_to_directory+"\\train.csv")
-            self.model.create_classifier(f.readlines(),test,self.entered_number)
-            messagebox.showinfo("Naive Bayes Classifier","Building classifier using train-set is done!")
+
+            try:
+                train = pd.read_csv(self.path_to_directory + "\\train.csv")
+            except:
+                messagebox.showerror("Naive Bayes Classifier", "the file train.csv has no data!")
+                return
+            file_content = f.readlines()
+            if len(file_content) > 0:
+                self.model.create_classifier(file_content, train, self.entered_number)
+            else:
+                messagebox.showerror("Naive Bayes Classifier", "the file Structure.txt has no data!")
+
+            messagebox.showinfo("Naive Bayes Classifier", "Building classifier using train-set is done!")
 
     def clik_on_classify(self):
-        test = pd.read_csv(self.path_to_directory + "\\test.csv")
+        """
+        Handler for classify button.
+        Creates new output file, and run the classification process.
+        In the end of the process the classification results will be on the output file.
+        :return:
+        """
+        try:
+            test = pd.read_csv(self.path_to_directory + "\\test.csv")
+        except:
+            messagebox.showerror("Naive Bayes Classifier", "the file test.csv has no data!")
+            return
         output_path =self.path_to_directory + '\output.txt'
         self.model.execute_classification(test,output_path)
         messagebox.showinfo("Naive Bayes Classifier", "Classification finish successfully! the output file is in "
