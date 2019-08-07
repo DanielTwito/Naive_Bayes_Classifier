@@ -68,8 +68,14 @@ class view(object):
         with open(self.path_to_directory + '\Structure.txt', "r") as f:
             test = pd.read_csv(self.path_to_directory+"\\train.csv")
             self.model.create_classifier(f.readlines(),test,self.entered_number)
+            messagebox.showinfo("Naive Bayes Classifier","Building classifier using train-set is done!")
 
     def clik_on_classify(self):
+        test = pd.read_csv(self.path_to_directory + "\\test.csv")
+        output_path =self.path_to_directory + '\output.txt'
+        self.model.execute_classification(test,output_path)
+        messagebox.showinfo("Naive Bayes Classifier", "Classification finish successfully! the output file is in "
+                            +self.path_to_directory+"/output.txt")
         pass
 
     def enable_build(self):
