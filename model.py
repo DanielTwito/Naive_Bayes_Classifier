@@ -8,8 +8,16 @@ class model:
     def __init__(self):
         self.train_model = None
         self.navie_bayes_classifier = None
+        self.expected_files = ["Structure.txt", "test.csv", "train.csv"]
 
-        pass
+    def validate_files(self, file_list):
+        ans = []
+        for file in self.expected_files:
+            if file in file_list:
+                continue
+            else:
+                ans.append(file)
+        return ans
 
     def create_classifier(self, keys, train, bin_num):
         features = self.extract_features(keys)
@@ -29,5 +37,4 @@ class model:
         with open(output_path, "w") as output:
             for index, row in test.iterrows():
                 prediction = self.navie_bayes_classifier.predict(row)
-                # output.write(str(index + 1) + " " + str(prediction)+"\n")
-                output.write(str(prediction)+"\n")
+                output.write(str(index + 1) + " " + str(prediction) + "\n")

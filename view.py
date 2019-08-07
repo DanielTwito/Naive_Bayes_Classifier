@@ -3,7 +3,7 @@ from tkinter import filedialog
 from tkinter import messagebox
 import pandas as pd
 from model import model
-
+import os
 class view(object):
 
     def __init__(self, master, model):
@@ -65,6 +65,10 @@ class view(object):
 
     def clik_on_build(self):
         self.enable_claasify()
+        missing = self.model.validate_files(os.listdir(self.path_to_directory))
+        if len(missing) > 0 :
+            messagebox.showerror("Naive Bayes Classifier","you must have this files "+ str(missing))
+            return
         with open(self.path_to_directory + '\Structure.txt', "r") as f:
             test = pd.read_csv(self.path_to_directory+"\\train.csv")
             self.model.create_classifier(f.readlines(),test,self.entered_number)
@@ -76,7 +80,7 @@ class view(object):
         self.model.execute_classification(test,output_path)
         messagebox.showinfo("Naive Bayes Classifier", "Classification finish successfully! the output file is in "
                             +self.path_to_directory+"/output.txt")
-        pass
+        exit(0)
 
     def enable_build(self):
         self.b_build.config(state=NORMAL)
